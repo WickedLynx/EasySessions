@@ -18,16 +18,31 @@ public class SessionManager {
     private var ongoingOperations = 0
     private lazy var processingQueue = dispatch_queue_create("com.lbs.easysessions.processingqueue", DISPATCH_QUEUE_CONCURRENT)
 
-    private var downloadSessionComponents: SessionComponents?
-    private var uploadSessionComponents: SessionComponents?
+    private lazy var downloadSessionComponents: SessionComponents = { [unowned self] in
+        let queue = NSOperationQueue()
+        queue.maxConcurrentOperationCount = 5
 
-    private var downloadSession: NSURLSession {
-        return downloadSessionComponents?.0 ?? initialiseDownloadSession().0
-    }
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.allowsCellularAccess = true
 
-    private var uploadSession: NSURLSession {
-        return uploadSessionComponents?.0 ?? initialiseUploadSession().0
-    }
+        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
+
+        return(session, queue)
+
+        } ()
+    
+    private lazy var uploadSessionComponents: SessionComponents = { [unowned self] in
+        let queue = NSOperationQueue()
+        queue.maxConcurrentOperationCount = 5
+
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.allowsCellularAccess = true
+
+        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
+
+        return(session, queue)
+        
+        } ()
 
     // MARK: Public functions
 
@@ -78,7 +93,7 @@ public class SessionManager {
     }
 
     private func ephemeralDataTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        let session = isUpload ? uploadSession : downloadSession
+        let session = isUpload ? uploadSessionComponents.0 : downloadSessionComponents.0
         updateAfterIncrementingNetworkIndicator(shouldIncrement: true)
         let task = session.dataTaskWithRequest(request, completionHandler: {[weak self] (data, response, error) -> Void in
             self?.updateAfterIncrementingNetworkIndicator(shouldIncrement: false)
@@ -90,33 +105,6 @@ public class SessionManager {
         return task
     }
 
-    private func initialiseDownloadSession() -> SessionComponents {
-        let queue = NSOperationQueue()
-        queue.maxConcurrentOperationCount = 5
-
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.allowsCellularAccess = true
-
-        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
-
-        downloadSessionComponents = (session, queue)
-
-        return downloadSessionComponents!
-    }
-
-    private func initialiseUploadSession() -> SessionComponents {
-        let queue = NSOperationQueue()
-        queue.maxConcurrentOperationCount = 5
-
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.allowsCellularAccess = true
-
-        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
-
-        uploadSessionComponents = (session, queue)
-
-        return uploadSessionComponents!
-    }
 
     private func updateAfterIncrementingNetworkIndicator(#shouldIncrement: Bool) {
         dispatch_async(dispatch_get_main_queue(), {[weak self] () -> Void in
