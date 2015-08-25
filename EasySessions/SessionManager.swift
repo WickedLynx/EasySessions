@@ -54,26 +54,26 @@ public class SessionManager {
 
     }
 
-    public func ephemeralDataDownloadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+    public func ephemeralDataDownloadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
         return ephemeralDataTaskWithRequest(request, isUpload: false, completion: completion)
     }
 
-    public func ephemeralDataUploadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+    public func ephemeralDataUploadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
         return ephemeralDataTaskWithRequest(request, isUpload: true, completion: completion)
     }
 
-    public func ephemeralJSONDownloadTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+    public func ephemeralJSONDownloadTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
         return ephemeralJSONTaskWithRequest(request, isUpload: false, completion: completion)
     }
 
-    public func ephemeralJSONUploadTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+    public func ephemeralJSONUploadTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
         return ephemeralJSONTaskWithRequest(request, isUpload: true, completion: completion)
     }
 
 
     // MARK: Private functions
 
-    private func ephemeralJSONTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((AnyObject?, NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+    private func ephemeralJSONTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
         return ephemeralDataTaskWithRequest(request, isUpload: isUpload, completion: {[weak self] (data, response, error) -> Void in
             if let cCompletion = completion {
                 var receivedObject: AnyObject?
@@ -96,7 +96,7 @@ public class SessionManager {
         })
     }
 
-    private func ephemeralDataTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+    private func ephemeralDataTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
         let session = isUpload ? uploadSessionComponents.0 : downloadSessionComponents.0
         updateAfterIncrementingNetworkIndicator(shouldIncrement: true)
         let task = session.dataTaskWithRequest(request, completionHandler: {[weak self] (data, response, error) -> Void in
@@ -122,7 +122,7 @@ public class SessionManager {
             }
             self?.updateAfterIncrementingNetworkIndicator(shouldIncrement: false)
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                completion?(data, response as? NSHTTPURLResponse, error)
+                completion?(data, response, error)
             })
         })
         task.resume()
