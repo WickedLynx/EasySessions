@@ -93,7 +93,7 @@ public class SessionManager {
                     cCompletion(nil, data, response, error)
                 }
             }
-            })
+        })
     }
 
     private func ephemeralDataTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((NSData?, NSHTTPURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
