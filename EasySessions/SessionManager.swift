@@ -13,6 +13,10 @@ typealias SessionComponents = (NSURLSession, NSOperationQueue)
 
 public class SessionManager {
 
+    // MARK: Public properties
+    /// Set true to enable logging
+    public var loggingEnabled = false
+
     // MARK: Private properties
 
     private var ongoingOperations = 0
@@ -96,6 +100,26 @@ public class SessionManager {
         let session = isUpload ? uploadSessionComponents.0 : downloadSessionComponents.0
         updateAfterIncrementingNetworkIndicator(shouldIncrement: true)
         let task = session.dataTaskWithRequest(request, completionHandler: {[weak self] (data, response, error) -> Void in
+            if self?.loggingEnabled ?? false {
+                var bodyAsString = "Body not set" as NSString
+                if let body = request.HTTPBody {
+                    bodyAsString = NSString(data: body, encoding: NSUTF8StringEncoding) ?? "Unable to decode body"
+                }
+
+                var returnedData = "No data returned" as NSString
+                if let cData = data {
+                    returnedData = NSString(data: cData, encoding: NSUTF8StringEncoding) ?? "Unable to decode returned data"
+                }
+
+                var statusCode = "Unable to get status code"
+                var responseHeaders = "Unable to get response headers"
+                if let cResponse = response as? NSHTTPURLResponse {
+                    statusCode = "\(cResponse.statusCode)"
+                    responseHeaders = "\(cResponse.allHeaderFields)"
+                }
+
+                println("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nRequest URL: \(request.URL!)\n-----------------------\nHeaders:\n\(request.allHTTPHeaderFields)\n-----------------------\nBody:\n\(bodyAsString)\n-----------------------\nResponse:\nStatus code: \(statusCode)\nHeaders:\(responseHeaders)\n-----------------------\nReceived data:\n\(returnedData)\n-----------------------\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n")
+            }
             self?.updateAfterIncrementingNetworkIndicator(shouldIncrement: false)
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 completion?(data, response, error)
