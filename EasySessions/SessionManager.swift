@@ -20,7 +20,7 @@ public class SessionManager {
     // MARK: Private properties
 
     private var ongoingOperations = 0
-    private lazy var processingQueue = dispatch_queue_create("com.lbs.easysessions.processingqueue", DISPATCH_QUEUE_CONCURRENT)
+    private lazy var processingQueue: dispatch_queue_t = dispatch_queue_create("com.lbs.easysessions.processingqueue", DISPATCH_QUEUE_CONCURRENT)
 
     private lazy var downloadSessionComponents: SessionComponents = { [unowned self] in
         let queue = NSOperationQueue()
@@ -81,7 +81,14 @@ public class SessionManager {
                 if let cData = data {
                     if let queue = self?.processingQueue {
                         dispatch_async(queue, { () -> Void in
-                            receivedObject = NSJSONSerialization.JSONObjectWithData(cData, options: .allZeros, error: &jsonError)
+                            do {
+                                receivedObject = try NSJSONSerialization.JSONObjectWithData(cData, options: [])
+                            } catch let error as NSError {
+                                jsonError = error
+                                receivedObject = nil
+                            } catch {
+                                fatalError()
+                            }
                             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                                 cCompletion(receivedObject, data, response, jsonError)
                             })
@@ -118,7 +125,7 @@ public class SessionManager {
                     responseHeaders = "\(cResponse.allHeaderFields)"
                 }
 
-                println("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nRequest URL: \(request.URL!)\n-----------------------\nHeaders:\n\(request.allHTTPHeaderFields)\n-----------------------\nBody:\n\(bodyAsString)\n-----------------------\nResponse:\nStatus code: \(statusCode)\nHeaders:\(responseHeaders)\n-----------------------\nReceived data:\n\(returnedData)\n-----------------------\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n")
+                print("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nRequest URL: \(request.URL!)\n-----------------------\nHeaders:\n\(request.allHTTPHeaderFields)\n-----------------------\nBody:\n\(bodyAsString)\n-----------------------\nResponse:\nStatus code: \(statusCode)\nHeaders:\(responseHeaders)\n-----------------------\nReceived data:\n\(returnedData)\n-----------------------\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n")
             }
             self?.updateAfterIncrementingNetworkIndicator(shouldIncrement: false)
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -130,7 +137,7 @@ public class SessionManager {
     }
 
 
-    private func updateAfterIncrementingNetworkIndicator(#shouldIncrement: Bool) {
+    private func updateAfterIncrementingNetworkIndicator(shouldIncrement shouldIncrement: Bool) {
         dispatch_async(dispatch_get_main_queue(), {[weak self] () -> Void in
             self?.ongoingOperations += shouldIncrement ? 1 : -1
             self?.ongoingOperations = max(self?.ongoingOperations ?? 0, 0)
