@@ -14,9 +14,9 @@ typealias SessionComponents = (NSURLSession, NSOperationQueue)
 public class SessionManager {
 
     // MARK: Private properties
-
+    private var parser: ResponseParsing.Type = DefaultParser.self
     private var ongoingOperations = 0
-    private lazy var processingQueue = dispatch_queue_create("com.lbs.easysessions.processingqueue", DISPATCH_QUEUE_CONCURRENT)
+    private lazy var processingQueue: dispatch_queue_t = dispatch_queue_create("com.lbs.easysessions.processingqueue", DISPATCH_QUEUE_CONCURRENT)
 
     private var downloadSessionComponents: SessionComponents?
     private var uploadSessionComponents: SessionComponents?
@@ -29,10 +29,13 @@ public class SessionManager {
         return uploadSessionComponents?.0 ?? initialiseUploadSession().0
     }
 
+
     // MARK: Public functions
 
-    public init() {
-
+    public init(parser: ResponseParsing.Type?) {
+        if let cParser = parser {
+            self.parser = cParser
+        }
     }
 
     public func ephemeralDataDownloadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
@@ -62,9 +65,17 @@ public class SessionManager {
                 if let cData = data {
                     if let queue = self?.processingQueue {
                         dispatch_async(queue, { () -> Void in
-                            receivedObject = NSJSONSerialization.JSONObjectWithData(cData, options: .allZeros, error: &jsonError)
+                            do {
+                                receivedObject = try NSJSONSerialization.JSONObjectWithData(cData, options: [])
+                            } catch let error as NSError {
+                                jsonError = error
+                                receivedObject = nil
+                            } catch {
+                                print("EasySessions: Unknown error")
+                            }
+                            let result = self?.parser.parseReceivedJSON(receivedObject, data: data, response: response, error: jsonError, forRequest: request)
                             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                                cCompletion(receivedObject, data, response, jsonError)
+                                cCompletion(result?.0, result?.1, result?.2, result?.3)
                             })
                         })
                     } else {
@@ -82,8 +93,9 @@ public class SessionManager {
         updateAfterIncrementingNetworkIndicator(shouldIncrement: true)
         let task = session.dataTaskWithRequest(request, completionHandler: {[weak self] (data, response, error) -> Void in
             self?.updateAfterIncrementingNetworkIndicator(shouldIncrement: false)
+            let result = self?.parser.parseReceivedData(data, response: response, error: error, forRequest: request)
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                completion?(data, response, error)
+                completion?(result?.0, result?.1, result?.2)
             })
         })
         task.resume()
@@ -92,7 +104,6 @@ public class SessionManager {
 
     private func initialiseDownloadSession() -> SessionComponents {
         let queue = NSOperationQueue()
-        queue.maxConcurrentOperationCount = 5
 
         let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
         configuration.allowsCellularAccess = true
@@ -106,7 +117,6 @@ public class SessionManager {
 
     private func initialiseUploadSession() -> SessionComponents {
         let queue = NSOperationQueue()
-        queue.maxConcurrentOperationCount = 5
 
         let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
         configuration.allowsCellularAccess = true
@@ -118,7 +128,7 @@ public class SessionManager {
         return uploadSessionComponents!
     }
 
-    private func updateAfterIncrementingNetworkIndicator(#shouldIncrement: Bool) {
+    private func updateAfterIncrementingNetworkIndicator(shouldIncrement shouldIncrement: Bool) {
         dispatch_async(dispatch_get_main_queue(), {[weak self] () -> Void in
             self?.ongoingOperations += shouldIncrement ? 1 : -1
             self?.ongoingOperations = max(self?.ongoingOperations ?? 0, 0)

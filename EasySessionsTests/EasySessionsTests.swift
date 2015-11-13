@@ -11,7 +11,7 @@ import XCTest
 import EasySessions
 
 class EasySessionsTests: XCTestCase {
-    let sessionManager = SessionManager()
+    let sessionManager = SessionManager(parser: nil)
 
     override func setUp() {
         super.setUp()
@@ -24,8 +24,8 @@ class EasySessionsTests: XCTestCase {
     }
 
     func testDataLoading() {
-        var url = NSURL(string: "http://www.apple.com")
-        var request = NSURLRequest(URL: url!)
+        let url = NSURL(string: "http://www.apple.com")
+        let request = NSURLRequest(URL: url!)
 
         let expectation1 = expectationWithDescription("Completion Handler1 Called")
         sessionManager.ephemeralDataDownloadTaskWithRequest(request, completion: { (data, response, error) -> Void in
@@ -36,7 +36,7 @@ class EasySessionsTests: XCTestCase {
         })
 
         waitForExpectationsWithTimeout(20, handler: { (error) -> Void in
-            println("Timed out:\n\(error)")
+            print("Timed out:\n\(error)")
         })
     }
 
