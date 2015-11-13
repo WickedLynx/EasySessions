@@ -13,21 +13,38 @@ typealias SessionComponents = (NSURLSession, NSOperationQueue)
 
 public class SessionManager {
 
+    // MARK: Public properties
+    /// Set true to enable logging
+    public var loggingEnabled = false
+
     // MARK: Private properties
     private var parser: ResponseParsing.Type = DefaultParser.self
     private var ongoingOperations = 0
     private lazy var processingQueue: dispatch_queue_t = dispatch_queue_create("com.lbs.easysessions.processingqueue", DISPATCH_QUEUE_CONCURRENT)
 
-    private var downloadSessionComponents: SessionComponents?
-    private var uploadSessionComponents: SessionComponents?
+    private lazy var downloadSessionComponents: SessionComponents = { [unowned self] in
+        let queue = NSOperationQueue()
 
-    private var downloadSession: NSURLSession {
-        return downloadSessionComponents?.0 ?? initialiseDownloadSession().0
-    }
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.allowsCellularAccess = true
 
-    private var uploadSession: NSURLSession {
-        return uploadSessionComponents?.0 ?? initialiseUploadSession().0
-    }
+        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
+
+        return(session, queue)
+
+        } ()
+    
+    private lazy var uploadSessionComponents: SessionComponents = { [unowned self] in
+        let queue = NSOperationQueue()
+
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.allowsCellularAccess = true
+
+        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
+
+        return(session, queue)
+        
+        } ()
 
 
     // MARK: Public functions
@@ -85,13 +102,33 @@ public class SessionManager {
                     cCompletion(nil, data, response, error)
                 }
             }
-            })
+        })
     }
 
     private func ephemeralDataTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        let session = isUpload ? uploadSession : downloadSession
+        let session = isUpload ? uploadSessionComponents.0 : downloadSessionComponents.0
         updateAfterIncrementingNetworkIndicator(shouldIncrement: true)
         let task = session.dataTaskWithRequest(request, completionHandler: {[weak self] (data, response, error) -> Void in
+            if self?.loggingEnabled ?? false {
+                var bodyAsString = "Body not set" as NSString
+                if let body = request.HTTPBody {
+                    bodyAsString = NSString(data: body, encoding: NSUTF8StringEncoding) ?? "Unable to decode body"
+                }
+
+                var returnedData = "No data returned" as NSString
+                if let cData = data {
+                    returnedData = NSString(data: cData, encoding: NSUTF8StringEncoding) ?? "Unable to decode returned data"
+                }
+
+                var statusCode = "Unable to get status code"
+                var responseHeaders = "Unable to get response headers"
+                if let cResponse = response as? NSHTTPURLResponse {
+                    statusCode = "\(cResponse.statusCode)"
+                    responseHeaders = "\(cResponse.allHeaderFields)"
+                }
+
+                print("\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\nRequest URL: \(request.URL!)\n-----------------------\nHeaders:\n\(request.allHTTPHeaderFields)\n-----------------------\nBody:\n\(bodyAsString)\n-----------------------\nResponse:\nStatus code: \(statusCode)\nHeaders:\(responseHeaders)\n-----------------------\nReceived data:\n\(returnedData)\n-----------------------\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n")
+            }
             self?.updateAfterIncrementingNetworkIndicator(shouldIncrement: false)
             let result = self?.parser.parseReceivedData(data, response: response, error: error, forRequest: request)
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -102,31 +139,6 @@ public class SessionManager {
         return task
     }
 
-    private func initialiseDownloadSession() -> SessionComponents {
-        let queue = NSOperationQueue()
-
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.allowsCellularAccess = true
-
-        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
-
-        downloadSessionComponents = (session, queue)
-
-        return downloadSessionComponents!
-    }
-
-    private func initialiseUploadSession() -> SessionComponents {
-        let queue = NSOperationQueue()
-
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.allowsCellularAccess = true
-
-        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
-
-        uploadSessionComponents = (session, queue)
-
-        return uploadSessionComponents!
-    }
 
     private func updateAfterIncrementingNetworkIndicator(shouldIncrement shouldIncrement: Bool) {
         dispatch_async(dispatch_get_main_queue(), {[weak self] () -> Void in
