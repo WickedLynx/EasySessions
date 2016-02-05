@@ -33,18 +33,6 @@ public class SessionManager {
         return(session, queue)
 
         } ()
-    
-    private lazy var uploadSessionComponents: SessionComponents = { [unowned self] in
-        let queue = NSOperationQueue()
-
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
-        configuration.allowsCellularAccess = true
-
-        let session = NSURLSession(configuration: configuration, delegate: nil, delegateQueue: queue)
-
-        return(session, queue)
-        
-        } ()
 
 
     // MARK: Public functions
@@ -56,26 +44,18 @@ public class SessionManager {
     }
 
     public func ephemeralDataDownloadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        return ephemeralDataTaskWithRequest(request, isUpload: false, completion: completion)
-    }
-
-    public func ephemeralDataUploadTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        return ephemeralDataTaskWithRequest(request, isUpload: true, completion: completion)
+        return ephemeralDataTaskWithRequest(request, completion: completion)
     }
 
     public func ephemeralJSONDownloadTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        return ephemeralJSONTaskWithRequest(request, isUpload: false, completion: completion)
-    }
-
-    public func ephemeralJSONUploadTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        return ephemeralJSONTaskWithRequest(request, isUpload: true, completion: completion)
+        return ephemeralJSONTaskWithRequest(request, completion: completion)
     }
 
 
     // MARK: Private functions
 
-    private func ephemeralJSONTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        return ephemeralDataTaskWithRequest(request, isUpload: isUpload, completion: {[weak self] (data, response, error) -> Void in
+    private func ephemeralJSONTaskWithRequest(request: NSURLRequest, completion: ((AnyObject?, NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+        return ephemeralDataTaskWithRequest(request, completion: {[weak self] (data, response, error) -> Void in
             if let cCompletion = completion {
                 var receivedObject: AnyObject?
                 var jsonError: NSError?
@@ -105,8 +85,8 @@ public class SessionManager {
         })
     }
 
-    private func ephemeralDataTaskWithRequest(request: NSURLRequest, isUpload: Bool, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
-        let session = isUpload ? uploadSessionComponents.0 : downloadSessionComponents.0
+    private func ephemeralDataTaskWithRequest(request: NSURLRequest, completion: ((NSData?, NSURLResponse?, NSError?) -> Void)?) -> NSURLSessionTask {
+        let session = downloadSessionComponents.0
         updateAfterIncrementingNetworkIndicator(shouldIncrement: true)
         let task = session.dataTaskWithRequest(request, completionHandler: {[weak self] (data, response, error) -> Void in
             if self?.loggingEnabled ?? false {
