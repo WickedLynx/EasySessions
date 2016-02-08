@@ -68,7 +68,7 @@ public extension NSURL {
     public class func URLWithPath<V: Stringify, K: Stringify>(path path: String, parameters: [K : V]?, baseURL: NSURL) -> NSURL? {
         var query = ""
         if let cParameters = parameters {
-            query = "?" + String.URLQuery(parameters: cParameters)
+            query = String.URLQuery(parameters: cParameters)
         }
         return URLWithPath(path: path, query: query, relativeToURL: baseURL)
     }
