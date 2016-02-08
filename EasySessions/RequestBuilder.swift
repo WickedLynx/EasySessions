@@ -44,7 +44,7 @@ public extension String {
     }
     ///////////////////////////////////////////////////////////////////////////////////
 
-    public static func URLQuery<T: Stringify>(parameters parameters: [T : T]) -> String {
+    public static func URLQuery<V: Stringify, K: Stringify>(parameters parameters: [K : V]) -> String {
         var query = ""
         var index = 0
         for (key, value) in parameters {
@@ -65,7 +65,7 @@ public extension NSURL {
         return components.URLRelativeToURL(baseURL)
     }
 
-    public class func URLWithPath<T: Stringify>(path path: String, parameters: [T : T]?, baseURL: NSURL) -> NSURL? {
+    public class func URLWithPath<V: Stringify, K: Stringify>(path path: String, parameters: [K : V]?, baseURL: NSURL) -> NSURL? {
         var query = ""
         if let cParameters = parameters {
             query = "?" + String.URLQuery(parameters: cParameters)
@@ -89,7 +89,7 @@ public extension NSMutableURLRequest {
         return jsonPOSTRequest(URL: URL, body: data)
     }
     
-    public class func jsonPOSTRequest<T: Stringify>(URL URL: NSURL, parameters: [T : T]) -> NSMutableURLRequest {
+    public class func jsonPOSTRequest<V: Stringify, K: Stringify>(URL URL: NSURL, parameters: [K : V]) -> NSMutableURLRequest {
         let query = String.URLQuery(parameters: parameters)
         let request = jsonPOSTRequest(URL: URL, body: query.dataUsingEncoding(NSUTF8StringEncoding))
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "content-type")
