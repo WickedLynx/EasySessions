@@ -44,12 +44,12 @@ public extension String {
     }
     ///////////////////////////////////////////////////////////////////////////////////
 
-    public static func URLQuery(parameters parameters: [String : String]) -> String {
+    public static func URLQuery<T: Stringify>(parameters parameters: [T : T]) -> String {
         var query = ""
         var index = 0
         for (key, value) in parameters {
             query += index == 0 ? "" : "&"
-            query += (key + "=" + (value.urlEncodedString() ?? ""))
+            query += (key.toString() + "=" + (value.toString().urlEncodedString() ?? ""))
             ++index
         }
         return query
@@ -65,7 +65,7 @@ public extension NSURL {
         return components.URLRelativeToURL(baseURL)
     }
 
-    public class func URLWithPath(path path: String, parameters: [String : String]?, baseURL: NSURL) -> NSURL? {
+    public class func URLWithPath<T: Stringify>(path path: String, parameters: [T : T]?, baseURL: NSURL) -> NSURL? {
         var query = ""
         if let cParameters = parameters {
             query = "?" + String.URLQuery(parameters: cParameters)
@@ -89,7 +89,7 @@ public extension NSMutableURLRequest {
         return jsonPOSTRequest(URL: URL, body: data)
     }
     
-    public class func jsonPOSTRequest(URL URL: NSURL, parameters: [String : String]) -> NSMutableURLRequest {
+    public class func jsonPOSTRequest<T: Stringify>(URL URL: NSURL, parameters: [T : T]) -> NSMutableURLRequest {
         let query = String.URLQuery(parameters: parameters)
         let request = jsonPOSTRequest(URL: URL, body: query.dataUsingEncoding(NSUTF8StringEncoding))
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "content-type")

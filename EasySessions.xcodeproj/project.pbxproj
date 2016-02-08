@@ -15,6 +15,8 @@
 		FA79A6A51B85CD04006420BA /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA79A6A41B85CD04006420BA /* SessionManager.swift */; };
 		FADB509E1C64911E00826752 /* RequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB509D1C64911E00826752 /* RequestBuilder.swift */; };
 		FADB509F1C64911E00826752 /* RequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB509D1C64911E00826752 /* RequestBuilder.swift */; };
+		FADB51571C685B9900826752 /* ValueTransformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB51561C685B9900826752 /* ValueTransformers.swift */; };
+		FADB51581C685B9900826752 /* ValueTransformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB51561C685B9900826752 /* ValueTransformers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +39,7 @@
 		FA79A69A1B85CC83006420BA /* EasySessionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EasySessionsTests.swift; sourceTree = "<group>"; };
 		FA79A6A41B85CD04006420BA /* SessionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		FADB509D1C64911E00826752 /* RequestBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RequestBuilder.swift; sourceTree = "<group>"; };
+		FADB51561C685B9900826752 /* ValueTransformers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValueTransformers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +86,7 @@
 				FA79A6A41B85CD04006420BA /* SessionManager.swift */,
 				FADB509D1C64911E00826752 /* RequestBuilder.swift */,
 				FA6257181BF5B3660053103B /* ResponseParser.swift */,
+				FADB51561C685B9900826752 /* ValueTransformers.swift */,
 				FA79A68B1B85CC83006420BA /* Supporting Files */,
 			);
 			path = EasySessions;
@@ -223,6 +227,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FADB509E1C64911E00826752 /* RequestBuilder.swift in Sources */,
+				FADB51571C685B9900826752 /* ValueTransformers.swift in Sources */,
 				FA79A6A51B85CD04006420BA /* SessionManager.swift in Sources */,
 				FA6257191BF5B3660053103B /* ResponseParser.swift in Sources */,
 			);
@@ -233,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FADB509F1C64911E00826752 /* RequestBuilder.swift in Sources */,
+				FADB51581C685B9900826752 /* ValueTransformers.swift in Sources */,
 				FA79A69B1B85CC83006420BA /* EasySessionsTests.swift in Sources */,
 				FA62571A1BF5B3660053103B /* ResponseParser.swift in Sources */,
 			);
