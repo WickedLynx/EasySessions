@@ -18,9 +18,9 @@ public struct QueryItemContainer: DictionaryLiteralConvertible {
         items = elements.map({return NSURLQueryItem(name: $0.toString(), value: $1.toString())})
     }
 
-//    public mutating func append(dictionaryLiteral elements: (StringRepresentable, StringRepresentable)...) {
-//        items.appendContentsOf(elements.map({return NSURLQueryItem(name: $0.toString(), value: $1.toString())}))
-//    }
+    public mutating func append(dictionaryLiteral elements: (StringRepresentable, StringRepresentable)...) {
+        items.appendContentsOf(elements.map({return NSURLQueryItem(name: $0.toString(), value: $1.toString())}))
+    }
 }
 
 
