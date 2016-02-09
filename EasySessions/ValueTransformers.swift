@@ -8,29 +8,29 @@
 
 import Foundation
 
-public protocol Stringify {
+public protocol StringRepresentable {
     func toString() -> String
 }
 
-extension Double: Stringify {
+extension Double: StringRepresentable {
     public func toString() -> String {
         return String(stringInterpolationSegment: Float64(self))
     }
 }
 
-extension Int: Stringify {
+extension Int: StringRepresentable {
     public func toString() -> String {
         return String(stringInterpolationSegment: self)
     }
 }
 
-extension String: Stringify {
+extension String: StringRepresentable {
     public func toString() -> String {
         return self
     }
 }
 
-extension Float: Stringify {
+extension Float: StringRepresentable {
     public func toString() -> String {
         return String(stringInterpolationSegment: self)
     }

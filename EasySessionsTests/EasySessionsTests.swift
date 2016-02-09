@@ -24,6 +24,7 @@ class EasySessionsTests: XCTestCase {
         super.tearDown()
     }
 
+
     func testDataLoading() {
         let baseURL = NSURL(string: "http://www.apple.com/")!
         let path = "support"
