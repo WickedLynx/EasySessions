@@ -6,9 +6,8 @@
 //  Copyright (c) 2015 Laughing Buddha Software. All rights reserved.
 //
 
-import UIKit
 import XCTest
-import EasySessions
+@testable import EasySessions
 
 class EasySessionsTests: XCTestCase {
     let sessionManager = SessionManager(parser: nil)
@@ -84,19 +83,6 @@ class EasySessionsTests: XCTestCase {
         
         XCTAssertEqual(bodyString, expectedBodyString, "The generated and expected body strings do not match")
     }
-
-    func testURLBuilding() {
-        let expectedURL = NSURL(string: "https://www.apple.com/support?platform=ios&version=1")
-        let url = NSURL.URLWithPath(path: "support", queryItems: ["platform" : "ios", "version" : 1] as QueryItemContainer, relativeToURL: NSURL(string: "https://www.apple.com/")!)
-        XCTAssertEqual(expectedURL?.absoluteString, url?.absoluteString, "URLs are not equal")
-    }
-
-    func testURLRequestBuilding() {
-        let expectedData = "platform=ios&version=1".dataUsingEncoding(NSUTF8StringEncoding)
-        let request = NSMutableURLRequest.jsonPOSTRequest(URL: NSURL(string: "https://www.apple.com")!, parameters: ["platform" : "ios", "version" : 1] as QueryItemContainer)
-        XCTAssertEqual(request.HTTPBody, expectedData, "Incorrect Post body generated")
-    }
-
 
     func testDataLoading() {
         let baseURL = NSURL(string: "http://www.apple.com/")!

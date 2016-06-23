@@ -8,15 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		FA6257191BF5B3660053103B /* ResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6257181BF5B3660053103B /* ResponseParser.swift */; };
-		FA62571A1BF5B3660053103B /* ResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA6257181BF5B3660053103B /* ResponseParser.swift */; };
 		FA79A68E1B85CC83006420BA /* EasySessions.h in Headers */ = {isa = PBXBuildFile; fileRef = FA79A68D1B85CC83006420BA /* EasySessions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FA79A6941B85CC83006420BA /* EasySessions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA79A6881B85CC83006420BA /* EasySessions.framework */; };
 		FA79A69B1B85CC83006420BA /* EasySessionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA79A69A1B85CC83006420BA /* EasySessionsTests.swift */; };
 		FA79A6A51B85CD04006420BA /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA79A6A41B85CD04006420BA /* SessionManager.swift */; };
 		FADB509E1C64911E00826752 /* RequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB509D1C64911E00826752 /* RequestBuilder.swift */; };
-		FADB509F1C64911E00826752 /* RequestBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB509D1C64911E00826752 /* RequestBuilder.swift */; };
 		FADB51571C685B9900826752 /* ValueTransformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB51561C685B9900826752 /* ValueTransformers.swift */; };
-		FADB51581C685B9900826752 /* ValueTransformers.swift in Sources */ = {isa = PBXBuildFile; fileRef = FADB51561C685B9900826752 /* ValueTransformers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -237,10 +234,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FADB509F1C64911E00826752 /* RequestBuilder.swift in Sources */,
-				FADB51581C685B9900826752 /* ValueTransformers.swift in Sources */,
 				FA79A69B1B85CC83006420BA /* EasySessionsTests.swift in Sources */,
-				FA62571A1BF5B3660053103B /* ResponseParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
