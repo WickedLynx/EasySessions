@@ -1,6 +1,6 @@
 //
 //  RequestBuilder.swift
-//  Shuttl
+//  EasySessions
 //
 //  Created by Harshad on 24/08/15.
 //  Copyright (c) 2015 Leftshift Technologies. All rights reserved.
