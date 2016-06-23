@@ -23,6 +23,67 @@ class EasySessionsTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
         super.tearDown()
     }
+    
+    
+    func testURLBuilding() {
+        guard let baseURL = NSURL(string: "https://www.apple.com") else {
+            XCTAssertTrue(true)
+            return
+        }
+        
+        let path = "support/downloads"
+        let query = ["platform" : "OS X", "orderBy" : "recent"] as QueryItemContainer
+        
+        guard let generatedURL = NSURL.URLWithPath(path: path, queryItems: query, relativeToURL: baseURL) else {
+            XCTFail("Failed to generate URL")
+            return
+        }
+        
+        let expectedURLString = "https://www.apple.com/support/downloads?platform=OS%20X&orderBy=recent"
+        let generatedURLString = generatedURL.absoluteString
+        
+        XCTAssertEqual(expectedURLString, generatedURLString, "Expected and generated URLs do not match")
+    }
+    
+    func testURLRequestBuilding() {
+        guard let baseURL = NSURL(string: "https://www.apple.com") else {
+            XCTAssertTrue(true)
+            return
+        }
+        
+        let path = "support/downloads"
+        let bodyQuery = ["platform" : "OS X", "orderBy" : "recent"] as QueryItemContainer
+        
+        guard let generatedURL = NSURL.URLWithPath(path: path, query: nil, relativeToURL: baseURL) else {
+            XCTFail("Failed to generate URL")
+            return
+        }
+        
+        let request = NSMutableURLRequest.jsonPOSTRequest(URL: generatedURL, parameters: bodyQuery)
+        
+        let expectedURLString = "https://www.apple.com/support/downloads"
+        guard let generatedURLString = request.URL?.absoluteString else {
+            XCTFail("Generated url request does not have a url")
+            return
+        }
+        
+        XCTAssertEqual(request.HTTPMethod.lowercaseString, "post", "The HTTP method of the request is set incorrectly")
+        XCTAssertEqual(expectedURLString, generatedURLString, "Expected and generated URLs do not match")
+        
+        guard let requestBody = request.HTTPBody else {
+            XCTFail("The generated request does not have a body")
+            return
+        }
+        
+        guard let bodyString = String(data: requestBody, encoding: NSUTF8StringEncoding) else {
+            XCTFail("The body was not encoded correctly")
+            return
+        }
+        
+        let expectedBodyString = "platform=OS%20X&orderBy=recent"
+        
+        XCTAssertEqual(bodyString, expectedBodyString, "The generated and expected body strings do not match")
+    }
 
     func testURLBuilding() {
         let expectedURL = NSURL(string: "https://www.apple.com/support?platform=ios&version=1")
