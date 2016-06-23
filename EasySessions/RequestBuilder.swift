@@ -17,10 +17,6 @@ public struct QueryItemContainer: DictionaryLiteralConvertible {
     public init(dictionaryLiteral elements: (StringRepresentable, StringRepresentable)...) {
         items = elements.map({return NSURLQueryItem(name: $0.toString(), value: $1.toString())})
     }
-
-//    public mutating func append(dictionaryLiteral elements: (StringRepresentable, StringRepresentable)...) {
-//        items.appendContentsOf(elements.map({return NSURLQueryItem(name: $0.toString(), value: $1.toString())}))
-//    }
 }
 
 
@@ -37,7 +33,7 @@ public extension NSURLComponents {
     public static func constructQueryStringWithItems(items: QueryItemContainer) -> String {
         let components = NSURLComponents()
         components.queryItems = items.items
-        return components.query ?? ""
+        return components.percentEncodedQuery ?? ""
     }
 }
 
